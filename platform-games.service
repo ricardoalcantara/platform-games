@@ -1,0 +1,16 @@
+# Copy to /etc/systemd/system/platform-games.service
+[Unit]
+Description=Platform VPS Service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/root/github/platform-games/platform-games
+WorkingDirectory=/root/github/platform-games
+
+[Install]
+WantedBy=multi-user.target
