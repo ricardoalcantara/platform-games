@@ -8,6 +8,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/ricardoalcantara/platform-games/internal/domain/catalog"
 	"github.com/ricardoalcantara/platform-games/internal/models"
 	"github.com/ricardoalcantara/platform-games/internal/utils"
 	"github.com/ricardoalcantara/platform-games/internal/version"
@@ -57,6 +58,8 @@ func main() {
 			"version":    version.Version,
 		})
 	})
+
+	catalog.RegisterRoutes(r)
 
 	host := utils.GetEnv("HOST", "")
 	port := utils.GetEnv("PORT", "10000")

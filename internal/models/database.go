@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"os"
 
 	"github.com/rs/zerolog/log"
@@ -33,32 +34,49 @@ func ConnectDataBase() {
 }
 
 func migrate() {
-	// DB.AutoMigrate(&DataCenterIp{})
+	DB.AutoMigrate(&CatalogTagType{})
+	DB.AutoMigrate(&Catalog{})
+	DB.AutoMigrate(&CatalogImage{})
+	DB.AutoMigrate(&CatalogVariation{})
+	DB.AutoMigrate(&VariationDetail{})
 }
 
 func createTypes() {
-	// if err := DB.Take(&VpsCatalogType{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
-	// 	var err error
+	if err := DB.Take(&CatalogTagType{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+		var err error
 
-	// 	err = DB.Transaction(func(tx *gorm.DB) error {
-	// 		for _, vt := range []VpsCatalogType{
-	// 			{ID: VpsCatalogTypeShared, TableType: TableType{Name: "Shared", Description: "VPS com vCPU compartilhado"}},
-	// 			{ID: VpsCatalogTypeCPUOptimized, TableType: TableType{Name: "CPU Otimizado", Description: "VPS com vCPU dedicado para uso maior de processamento"}},
-	// 			{ID: VpsCatalogTypeMemoryOptimized, TableType: TableType{Name: "CPU Optimized", Description: "VPS com Memória otimizada e vCPU dedicada para uso maior de memória"}},
-	// 			{ID: VpsCatalogTypeGeneral, TableType: TableType{Name: "Recurso Dedicado", Description: "VPS com vCPU dedicada e mais memória para uso geral"}},
-	// 		} {
-	// 			if err = DB.Create(&vt).Error; err != nil {
-	// 				return err
-	// 			}
-	// 		}
+		err = DB.Transaction(func(tx *gorm.DB) error {
+			for _, vt := range []CatalogTagType{
+				{ID: CatalogTagTypeAction, TableType: TableType{Name: "Action", Description: "Games that focus on physical challenges, including hand-eye coordination and reaction time."}},
+				{ID: CatalogTagTypeAdventure, TableType: TableType{Name: "Adventure", Description: "Story-driven games where players explore virtual worlds, solve puzzles, and interact with characters."}},
+				{ID: CatalogTagTypeRPG, TableType: TableType{Name: "Role-Playing Game (RPG)", Description: "Games where players take on the roles of characters in a fictional setting, often involving character development, decision-making, and narrative."}},
+				{ID: CatalogTagTypeSimulation, TableType: TableType{Name: "Simulation", Description: "Games that replicate real-world activities, such as driving, flying, or life simulation."}},
+				{ID: CatalogTagTypeStrategy, TableType: TableType{Name: "Strategy", Description: "Games that require planning, resource management, and tactical decision-making."}},
+				{ID: CatalogTagTypeSports, TableType: TableType{Name: "Sports", Description: "Simulations of real-world sports, including soccer, basketball, and racing."}},
+				{ID: CatalogTagTypeFighting, TableType: TableType{Name: "Fighting", Description: "Games where players engage in hand-to-hand combat with opponents."}},
+				{ID: CatalogTagTypeHorror, TableType: TableType{Name: "Horror", Description: "Games designed to create a sense of fear and suspense."}},
+				{ID: CatalogTagTypePuzzle, TableType: TableType{Name: "Puzzle", Description: "Games that challenge players with logic and problem-solving tasks."}},
+				{ID: CatalogTagTypeMusicRhythm, TableType: TableType{Name: "Music/Rhythm", Description: "Games where players interact with music or rhythm-based challenges."}},
+				{ID: CatalogTagTypeMMO, TableType: TableType{Name: "Massively Multiplayer Online (MMO)", Description: "Online games that support large numbers of players interacting in a persistent virtual world."}},
+				{ID: CatalogTagTypeBattleRoyale, TableType: TableType{Name: "Battle Royale", Description: "Games where a large number of players compete to be the last person or team standing."}},
+				{ID: CatalogTagTypeSurvival, TableType: TableType{Name: "Survival", Description: "Games where players must survive in a hostile environment, often with limited resources."}},
+				{ID: CatalogTagTypeOpenWorld, TableType: TableType{Name: "Open World", Description: "Games with a vast, seamless game world that players can explore freely."}},
+				{ID: CatalogTagTypeEducational, TableType: TableType{Name: "Educational", Description: "Games designed to teach or reinforce educational concepts."}},
+				{ID: CatalogTagTypeSandbox, TableType: TableType{Name: "Sandbox", Description: "Games that provide a virtual sandbox for players to create, modify, or interact with the game world."}},
+				{ID: CatalogTagTypeVisualNovel, TableType: TableType{Name: "Visual Novel", Description: "Interactive narratives often with static images and text."}},
+			} {
+				if err = DB.Create(&vt).Error; err != nil {
+					return err
+				}
+			}
 
-	// 		return nil
-	// 	})
+			return nil
+		})
 
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-	// }
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	// if err := DB.Take(&VpsAddonsType{}).Error; errors.Is(err, gorm.ErrRecordNotFound) {
 	// 	var err error

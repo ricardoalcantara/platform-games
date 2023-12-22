@@ -4,48 +4,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type CatalogImage struct {
-	ID        uint `gorm:"primarykey"`
-	CatalogId uint
-	Url       string
-
-	Catalog *Catalog
-}
-
 type Catalog struct {
 	gorm.Model
 
-	Name        string
-	Description string
-	Tags        []string
-
+	Name             string `gorm:"type:varchar(255);not null"`
+	Description      string `gorm:"type:text;not null"`
+	Active           bool
+	CatalogTagType   []CatalogTagType `gorm:"many2many:catalog_tags;"`
 	CatalogVariation []CatalogVariation
 	CatalogImage     []CatalogImage
-}
-
-type CatalogVariation struct {
-	ID        uint `gorm:"primarykey"`
-	CatalogId uint
-	Name      string
-	Price     float64 `gorm:"type:decimal(15,2);not null"`
-	Active    bool    `gorm:"not null;"`
-
-	Memory     int `gorm:"type:int;not null"`
-	DiskSize   int `gorm:"type:int;not null"`
-	MaxPlayers int `gorm:"type:int;not null"`
-
-	Catalog         *Catalog
-	VariationDetail []VariationDetail
-}
-
-type VariationDetail struct {
-	CatalogVariationId uint
-
-	Key    string
-	Value  string
-	Global bool
-
-	CatalogVariation *CatalogVariation
 }
 
 func (p *Catalog) Save(tx *gorm.DB) error {
@@ -61,7 +28,7 @@ func (p *Catalog) Save(tx *gorm.DB) error {
 	return nil
 }
 
-func ListActiveVpsCatalog() ([]Catalog, error) {
+func ListCatalog() ([]Catalog, error) {
 	var err error
 	var p []Catalog
 
@@ -71,8 +38,11 @@ func ListActiveVpsCatalog() ([]Catalog, error) {
 
 	err = DB.
 		// Scopes(filter.GetScope).
-		Where("active = ?", true).
-		Order("vps_catalog_type_id, price").
+		Preload("CatalogTagType").
+		Preload("CatalogVariation").
+		Preload("CatalogVariation.VariationDetail").
+		Preload("CatalogImage").
+		// Where("active = ?", true).
 		Find(&p).Error
 
 	if err != nil {
@@ -82,10 +52,16 @@ func ListActiveVpsCatalog() ([]Catalog, error) {
 	return p, nil
 }
 
-func GetVpsCatalog(id uint) (*Catalog, error) {
+func GetCatalog(id uint) (*Catalog, error) {
 	var err error
 	p := Catalog{}
-	err = DB.Take(&p, "id = ?", id).Error
+	err = DB.
+		Preload("CatalogTagType").
+		Preload("CatalogVariation").
+		Preload("CatalogVariation.VariationDetail").
+		Preload("CatalogImage").
+		Take(&p, "id = ?", id).
+		Error
 
 	if err != nil {
 		return nil, err
